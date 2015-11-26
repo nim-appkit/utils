@@ -21,4 +21,4 @@ This project follows [SemVer](semver.org).
 
 ### License.
 
-This project is under the [LGPL 3](http://www.gnu.org/licenses/lgpl-3.0.en.html) license.
+This project is under the [MIT](https://opensource.org/licenses/MIT) license.
