@@ -17,6 +17,26 @@ from strutils import nil
 
 type Ptr*[T] = object
   # Ptr is a helper object that makes working with pointers more convenient.
+  #
+  # Usage:
+  # 
+  # 
+  # var p = newPtr[uint8](64) # Allocate pointer holding 64 uint8 values.
+  # p[25] = 88'u8 # Set the 26th byte to 88.
+  # var val25 = p[25][] # Retrive the 26th byte and retrieve it's contents (as uint8 here).
+  # p[30].convert(uint64)[] # Create a uint64 pointer starting at position 30 of the origin pointer.
+  # 
+  # var x: pointer = alloc0(10)
+  # p.copyFrom(x, 10) # Copy 10 bytes from another pointer into the pointer.
+  # 
+  # p[5].copyTo(x) # Retrieve a pointer for the 5th position, and copy all remaining bytes to the pointer given.
+  # 
+  # echo(p.toString()) # Convert each item of the pointer to a char and return a string. 
+  #   (WARNING: must be a uint8 pointer to work properly)
+  # 
+  # echo(p.toBinary()) # Retrieve the pointer as a string binary representation. (0000 1010 ...)
+  # 
+  # p.free() # Deallocate the pointer.
 
   ptrVal*: ptr T
   ptrAddr*: ByteAddress
