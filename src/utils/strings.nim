@@ -21,8 +21,8 @@ proc `or`*(a, b: string): string =
   # `or` operator for strings.
   # Returns a if a is neither nil nor empty.
   # Otherwise, it returns either b, or an empty string if b is nil.
-  var a = if a == nil: "" else: a
-  var b = if b == nil: "" else: b
+  let a = if a == nil: "" else: a
+  let b = if b == nil: "" else: b
   
   return if a != "": a else: b
 
@@ -175,7 +175,8 @@ proc pluralize*(str: string): string =
 # Better $ / repr / format. #
 #############################
 
-proc format(s: string, args varargs[string, `$`]): string =
+discard """
+proc format(s: string, args: varargs[string, `$`]): string =
   # A save version of format, which does not error out on nil strings.
   var args = args
   for index, arg in args:
@@ -183,6 +184,7 @@ proc format(s: string, args varargs[string, `$`]): string =
       args[index] = "nil!"
 
   return strutils.format(s, args)
+"""
 
 proc repr*(s: string): string =
   if s == nil:

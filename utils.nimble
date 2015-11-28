@@ -8,4 +8,4 @@ license       = "MIT"
 srcDir        = "src"
 
 [Deps]
-Requires: "nim >= 0.12.0"
+Requires: "nim >= 0.12.0, values >= 0.1"
