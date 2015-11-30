@@ -48,16 +48,16 @@ Suite "Config":
       var c = newConfig()
       c["x"] = "x"
       c["a.b.c.d"] = 22
-      c["x"].should equal "x"
-      c["a"]["b"]["c"]["d"].should equal 22
+      assert c["x"] == "x"
+      assert c["a"]["b"]["c"]["d"] == 22
 
     It "Should set/get nested values with .(=)":
       var c = newConfig() 
       c.x = "x"
       c["a.b.c.d"] = 22
 
-      c.x.should equal "x"
-      c.a.b.c.d.should equal 22
+      assert c.x == "x"
+      assert c.a.b.c.d == 22
       c.getValue("a.b.c.d").should equal 22
 
   Describe "Typed accessors":
@@ -109,7 +109,7 @@ Suite "Config":
       c.s = "s"
       c.i = 1
       c.f = 1.1
-      c.nested = ValMap((arr: @[1, 2, 3]))
+      c.nested = @%(arr: @[1, 2, 3])
 
       c.writeJsonFile(tmpFile)
       var fileC = configFromJsonFile(tmpFile)

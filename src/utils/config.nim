@@ -27,24 +27,24 @@ type Config* = ref object of RootObj
   # Provides many convenience accesors to access (nested) configuration data 
   # and options for loading configuration from YAML, JSON, or ini files.
 
-  data: ValueMap
+  data: Map
 
 ######################
 # Getters / setters. #
 ######################
 
-proc getData*(c: Config): ValueMap =
+proc getData*(c: Config): Map =
   # Retrieve the raw config data as values.ValueMap.
 
   c.data
 
-proc setData*(c: Config, data: ValueMap not nil) =
+proc setData*(c: Config, data: Map not nil) =
   # Set the config data from a values.ValueMap.
 
   c.data = data
 
-iterator pairs*(c: Config, nested: bool = false): tuple[key: string, val: Value] =
-  for key, val in c.data.pairs:
+iterator pairs*(c: Config, nested: bool = false): tuple[key: string, val: ValueRef] =
+  for key, val in c.data.fieldPairs:
     yield (key, val)
 
 iterator keys*(c: Config): string =
@@ -66,10 +66,10 @@ proc setValue*[T](c: Config, key: string, val: T) =
       data[left] = newValueMap()
 
     key = right
-    data = data[left].getMap()
+    data = data[left]
   data[key] = val
 
-proc getValue*(c: Config, key: string, defaultVal: Value): Value =
+proc getValue*(c: Config, key: string, defaultVal: ValueRef): ValueRef =
   # Retrieve a raw values.Value config key.
   # 
   # If the key is not found, the given default is returned.
@@ -80,11 +80,11 @@ proc getValue*(c: Config, key: string, defaultVal: Value): Value =
     var (left, right) = strings.lsplit(key, ".")
     if not data.hasKey(left):
       return defaultVal
-    data = data[left].getMap()
+    data = data[left]
     key = right
   result = if data.hasKey(key): data[key] else: defaultVal
 
-proc getValue*(c: Config, key: string not nil): Value {.raises: [KeyError, values.ValueErr, ValueError].} =
+proc getValue*(c: Config, key: string): ValueRef {.raises: [Exception, KeyError, ValueError].} =
   # Retrieve a raw values.Value config key.
   # 
   # If the key is not found, a KeyError is raised.
@@ -92,13 +92,13 @@ proc getValue*(c: Config, key: string not nil): Value {.raises: [KeyError, value
   if result == nil:
     raise newException(KeyError, "Config key $1 not found".format(key))
 
-proc `[]`*(c: Config, key: string not nil): Value =
+proc `[]`*(c: Config, key: string not nil): ValueRef =
   c.getValue(key)
 
 proc `[]=`*[T](c: Config, key: string, val: T) =
   c.setValue(key, val)
 
-proc `.`*(c: Config, key: string not nil): Value =
+proc `.`*(c: Config, key: string not nil): ValueRef =
   c.getValue(key)
 
 proc `.=`*[T](c: Config, key: string, val: T) =
@@ -194,7 +194,7 @@ proc newConfig*(): Config =
 proc newConfig*(data: tuple): Config =
   # Build a new config based on a tuple.
 
-  result = Config(data: values.ValMap(data))
+  result = Config(data: @%(data))
   result.data.autoNesting = true
 
 
@@ -202,13 +202,13 @@ proc newConfig*(data: tuple): Config =
 # JSON. #
 #########
 
-proc configFromJson*(jsonContent: string): Config {.raises: [ValueError, json.JsonParsingError, values.ValueErr, Exception].} = 
+proc configFromJson*(jsonContent: string): Config {.raises: [ValueError, json.JsonParsingError, Exception].} = 
   # Load configuration from a json string.
 
-  result = Config(data: values.fromJson(jsonContent).getMap())
+  result = Config(data: values.fromJson(jsonContent))
   result.data.autoNesting = true
 
-proc configFromJsonFile*(path: string): Config {.raises: [IOError, ValueError, json.JsonParsingError, values.ValueErr, Exception].} =
+proc configFromJsonFile*(path: string): Config {.raises: [IOError, ValueError, json.JsonParsingError, Exception].} =
   # Load configuration from a JSON file.
 
   result = configFromJson(readFile(path))
